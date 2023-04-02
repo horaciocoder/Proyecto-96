@@ -1,20 +1,48 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React from 'react';
+import { createAppContainer } from 'react-navigation';
+import { createSwitchNavigator } from 'react-navigation';
+import SignUpScreen from './screens/SignUpScreen';
+import SignInScreen from './screens/SignInScreen'
+import HomeScreen from './screens/HomeScreen';
+import * as Font from 'expo-font';
+import AppLoadingScreen from './screens/LoadingScreen';
+import { Alert } from 'react-native';
+const SwitchNavigator = createSwitchNavigator({
+  Home:HomeScreen,
+  SignUp:SignUpScreen,
+  SignIn:SignInScreen,
+})
+const AppContainer = createAppContainer(SwitchNavigator);
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
+export default class App extends React.Component
+{
+  constructor(props)
+  {
+    super(props);
+    this.state = {fontsLoaded:false}
+  }
+  async LoadFonts()
+  {
+   await Font.loadAsync({
+    "Axiforma":require('./assets/fonts/axiforma-semi-bold.otf')
+   }).then(()=>
+   {
+    this.setState({fontsLoaded:true});
+   }).catch(()=>
+   {
+    Alert.alert("Unknown Error", "An unknown error has ocurred while loading the app, please try again later...");
+   })
+  }
+  componentDidMount()
+  {
+    this.LoadFonts();
+  }
+  render()
+  {
+    if (!this.state.fontsLoaded)
+    {
+      return <AppLoadingScreen/>
+    }
+    return <AppContainer/>
+  }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
